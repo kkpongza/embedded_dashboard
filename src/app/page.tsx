@@ -1,95 +1,63 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useEffect, useState } from "react";
+import TimelineGraph from "./components/TimeLineGraph";
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    const [sheetData, setSheetData] = useState<string[][] | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+    useEffect(() => {
+        let intervalId: NodeJS.Timeout;
+
+        const fetchData = async () => {
+            try {
+                const res = await fetch("/api/sheet");
+                if (!res.ok)
+                    throw new Error("Failed to fetch Google Sheets data");
+                const data = await res.json();
+                setSheetData(data);
+            } catch (err: any) {
+                setError(err.message);
+            }
+        };
+
+        // Fetch data immediately on mount
+        fetchData();
+
+        // Set up polling every 1 minute (60000 ms)
+        intervalId = setInterval(fetchData, 60000);
+
+        // Cleanup interval on component unmount
+        return () => clearInterval(intervalId);
+    }, []);
+
+    return (
+        <div>
+            <h1
+                style={{
+                    textAlign: "center",
+                    marginBottom: "20px",
+                    marginTop: "20px",
+                }}
+            >
+                Google Sheets Data
+            </h1>
+            <div
+                style={{
+                    width: "80%",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                }}
+            >
+                <TimelineGraph data={sheetData} />
+            </div>
+
+            {/* {error ? (
+                <p>Error: {error}</p>
+            ) : (
+                <pre>{JSON.stringify(sheetData, null, 2)}</pre>
+            )} */}
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+    );
 }
