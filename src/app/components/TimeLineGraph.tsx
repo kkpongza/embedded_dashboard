@@ -20,11 +20,6 @@ ChartJS.register(
     Legend
 );
 
-interface DataPoint {
-    timestamp: string;
-    value: string;
-}
-
 interface TimelineGraphProps {
     data: any;
 }
