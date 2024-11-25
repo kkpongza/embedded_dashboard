@@ -8,6 +8,7 @@ import {
     Title,
     Tooltip,
     Legend,
+    ChartOptions,
 } from "chart.js";
 
 // Register Chart.js components
@@ -21,20 +22,22 @@ ChartJS.register(
 );
 
 interface TimelineGraphProps {
-    data: any;
+    data: [string, string][];
 }
 
-const TimelineGraph: React.FC<TimelineGraphProps> = ({ data }: any) => {
+const TimelineGraph: React.FC<TimelineGraphProps> = ({
+    data,
+}: TimelineGraphProps) => {
     // Transform data into the format required for Chart.js
     if (!data) return null;
 
-    const labels = data.map((item: any) =>
+    const labels = data.map((item: [string, string]) =>
         new Date(item[0]).toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
         })
     );
-    const values = data.map((item: any) =>
+    const values = data.map((item: [string, string]) =>
         item[1] === "True" || item[1] === "TRUE" ? 1 : 0
     );
 
@@ -51,30 +54,30 @@ const TimelineGraph: React.FC<TimelineGraphProps> = ({ data }: any) => {
         ],
     };
 
-    const chartOptions: any = {
+    const chartOptions: ChartOptions<"bar"> = {
         responsive: true,
         plugins: {
             legend: {
                 display: true,
-                position: "top",
+                position: "top", // Position of the legend
             },
         },
         scales: {
             x: {
                 title: {
                     display: true,
-                    text: "Time",
+                    text: "Time", // X-axis title
                 },
             },
             y: {
                 title: {
                     display: true,
-                    text: "Value",
+                    text: "Value", // Y-axis title
                 },
                 ticks: {
-                    stepSize: 1,
-                    callback: (value: number) =>
-                        value === 1 ? "True" : "False",
+                    stepSize: 1, // Increment steps
+                    callback: (value: number | string) =>
+                        value === 1 ? "True" : "False", // Y-axis labels
                 },
             },
         },

@@ -4,12 +4,9 @@ import { useEffect, useState } from "react";
 import TimelineGraph from "./components/TimeLineGraph";
 
 export default function Home() {
-    const [sheetData, setSheetData] = useState<string[][] | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const [sheetData, setSheetData] = useState<[string, string][] | null>(null);
 
     useEffect(() => {
-        let intervalId: NodeJS.Timeout;
-
         const fetchData = async () => {
             try {
                 const res = await fetch("/api/sheet");
@@ -17,8 +14,8 @@ export default function Home() {
                     throw new Error("Failed to fetch Google Sheets data");
                 const data = await res.json();
                 setSheetData(data);
-            } catch (err: any) {
-                setError(err.message);
+            } catch (err: unknown) {
+                console.log(err);
             }
         };
 
@@ -26,7 +23,7 @@ export default function Home() {
         fetchData();
 
         // Set up polling every 1 minute (60000 ms)
-        intervalId = setInterval(fetchData, 60000);
+        const intervalId = setInterval(fetchData, 60000);
 
         // Cleanup interval on component unmount
         return () => clearInterval(intervalId);
@@ -50,7 +47,7 @@ export default function Home() {
                     marginRight: "auto",
                 }}
             >
-                <TimelineGraph data={sheetData} />
+                <TimelineGraph data={sheetData || [["", ""]]} />
             </div>
 
             {/* {error ? (
