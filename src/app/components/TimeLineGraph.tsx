@@ -1,92 +1,84 @@
 import React from "react";
-import { Bar } from "react-chartjs-2";
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-    ChartOptions,
-} from "chart.js";
+import { BarChart } from "@mui/x-charts/BarChart";
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
-// Register Chart.js components
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend
-);
+// Extend dayjs with custom parse format
+dayjs.extend(customParseFormat);
 
 interface TimelineGraphProps {
-    data: [string, string][];
+    data: [string, string, string][] | null; // [timestamp, status, extra]
 }
 
-const TimelineGraph: React.FC<TimelineGraphProps> = ({
-    data,
-}: TimelineGraphProps) => {
-    // Transform data into the format required for Chart.js
-    if (!data) return null;
+const TimelineGraph: React.FC<TimelineGraphProps> = ({ data }) => {
+    if (!data || data.length === 0) return;
 
-    const labels = data.map((item: [string, string]) =>
-        new Date(item[0]).toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-        })
+    // Step 1: Extract unique date-times from existing data and mark them as TRUE
+    const uniqueDates = Array.from(
+        new Set(data.map((item) => dayjs(item[0]).format("YYYY-MM-DD HH:mm")))
     );
-    const values = data.map((item: [string, string]) =>
-        item[1] === "True" || item[1] === "TRUE" ? 1 : 0
+    console.log(uniqueDates);
+    const filledData = uniqueDates.map(
+        (dateTime) => [dateTime, "TRUE"] as [string, string]
     );
 
-    const chartData = {
-        labels,
-        datasets: [
-            {
-                label: "Human Detect(found)",
-                data: values,
-                backgroundColor: "rgba(255, 99, 132, 0.6)", // Red color for bars
-                borderColor: "rgba(255, 99, 132, 1)", // Red color for bar borders
-                borderWidth: 1,
-            },
-        ],
-    };
+    // Step 2: Parse date strings and determine min and max date-times
+    const maxTime = dayjs(filledData[0][0], "YYYY-MM-DD HH:mm");
+    const minTime = dayjs(
+        filledData[filledData.length - 1][0],
+        "YYYY-MM-DD HH:mm"
+    );
 
-    const chartOptions: ChartOptions<"bar"> = {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: true,
-                position: "top", // Position of the legend
-            },
-        },
-        scales: {
-            x: {
-                title: {
-                    display: true,
-                    text: "Time", // X-axis title
-                },
-            },
-            y: {
-                title: {
-                    display: true,
-                    text: "Value", // Y-axis title
-                },
-                ticks: {
-                    stepSize: 1, // Increment steps
-                    callback: (value: number | string) =>
-                        value === 1 ? "True" : "False", // Y-axis labels
-                },
-            },
-        },
-    };
+    // Step 3: Fill in missing minutes between minTime and maxTime, marking them as FALSE
+    const completeData: [string, string][] = [];
+    let currentTime = minTime;
+
+    while (currentTime.isBefore(maxTime) || currentTime.isSame(maxTime)) {
+        const currentTimeStr = currentTime.format("YYYY-MM-DD HH:mm");
+
+        // Check if the current time exists in the filledData
+        const existingData = filledData.find(
+            (item) => item[0] === currentTimeStr
+        );
+
+        if (existingData) {
+            completeData.push(existingData);
+        } else {
+            completeData.push([currentTimeStr, "FALSE"]); // Mark missing minutes as FALSE
+        }
+
+        // Increment by 1 minute
+        currentTime = currentTime.add(1, "minute");
+    }
+    console.log(completeData);
+
+    // Step 4: Prepare data for the BarChart
+    const labels = completeData.map(
+        (item) => dayjs(item[0], "YYYY-MM-DD HH:mm").format("HH:mm") // Format timestamps as HH:mm for the x-axis
+    );
+    const seriesData = completeData.map((item) => (item[1] === "TRUE" ? 1 : 0)); // Convert TRUE to 1, FALSE to 0
 
     return (
-        <div>
-            <h1>Timeline Bar Chart</h1>
-            <Bar data={chartData} options={chartOptions} />
+        <div
+            style={{
+                width: "80%",
+                margin: "0 auto",
+                display: "flex",
+                justifyContent: "center",
+            }}
+        >
+            <BarChart
+                xAxis={[{ scaleType: "band", data: labels }]} // Set X-axis labels
+                series={[
+                    {
+                        label: "Human Detection (found = 1)",
+                        data: seriesData,
+                        color: "#E72929",
+                    },
+                ]}
+                width={1000} // Chart width
+                height={250} // Chart height
+            />
         </div>
     );
 };

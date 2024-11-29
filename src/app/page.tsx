@@ -2,9 +2,12 @@
 
 import { useEffect, useState } from "react";
 import TimelineGraph from "./components/TimeLineGraph";
+import HumanDetectionLog from "./components/HumanDetectionLog";
 
 export default function Home() {
-    const [sheetData, setSheetData] = useState<[string, string][] | null>(null);
+    const [sheetData, setSheetData] = useState<
+        [string, string, string][] | null
+    >(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -13,7 +16,10 @@ export default function Home() {
                 if (!res.ok)
                     throw new Error("Failed to fetch Google Sheets data");
                 const data = await res.json();
-                setSheetData(data);
+
+                //TODO: reverse the array of data
+                const reversedData = data.reverse();
+                setSheetData(reversedData);
             } catch (err: unknown) {
                 console.log(err);
             }
@@ -38,23 +44,11 @@ export default function Home() {
                     marginTop: "20px",
                 }}
             >
-                Google Sheets Data
+                Human Detection
             </h1>
-            <div
-                style={{
-                    width: "80%",
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                }}
-            >
-                <TimelineGraph data={sheetData || [["", ""]]} />
-            </div>
+            <HumanDetectionLog sheetData={sheetData || null} />
 
-            {/* {error ? (
-                <p>Error: {error}</p>
-            ) : (
-                <pre>{JSON.stringify(sheetData, null, 2)}</pre>
-            )} */}
+            <TimelineGraph data={sheetData || null} />
         </div>
     );
 }

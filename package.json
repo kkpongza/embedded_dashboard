@@ -9,7 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.5",
+    "@emotion/styled": "^11.13.5",
+    "@mui/material": "^6.1.9",
+    "@mui/x-charts": "^7.23.0",
+    "@tabler/icons-react": "^3.23.0",
     "chart.js": "^4.4.6",
+    "dayjs": "^1.11.13",
     "googleapis": "^144.0.0",
     "next": "14.2.18",
     "react": "^18",
@@ -20,8 +26,6 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "eslint": "^8",
-    "eslint-config-next": "14.2.18",
     "typescript": "^5"
   }
 }

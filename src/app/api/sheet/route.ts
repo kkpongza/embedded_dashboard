@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
     const sheetId = "1YRwQumypfdpou0Zm4k70Xy7jJ1BmT-tHclBRXyaVBXQ";
-    const range = "log!A:B";
+    const range = "log!A:C";
 
     try {
         const data = await fetchGoogleSheetData(sheetId, range);
