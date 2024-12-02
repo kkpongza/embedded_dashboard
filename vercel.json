@@ -1,8 +1,19 @@
 {
-    "framework": "nextjs",
-    "build": {
-      "env": {
-        "NEXT_PUBLIC_DISABLE_ESLINT": "true"
-      }
+  "framework": "nextjs",
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_DISABLE_ESLINT": "true"
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/api/sheet",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
+    }
+  ]
+}
