@@ -7,7 +7,9 @@ export async function GET() {
 
     try {
         const data = await fetchGoogleSheetData(sheetId, range);
-        return NextResponse.json(data);
+        const response = NextResponse.json(data);
+        response.headers.set("Cache-Control", "no-store");
+        return response;
     } catch (error) {
         console.error("Error fetching Google Sheets data:", error);
         return NextResponse.json(

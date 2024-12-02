@@ -29,10 +29,10 @@ export default function Home() {
         fetchData();
 
         // Set up polling every 1 minute (60000 ms)
-        const intervalId = setInterval(fetchData, 60000);
+        // const intervalId = setInterval(fetchData, 60000);
 
         // Cleanup interval on component unmount
-        return () => clearInterval(intervalId);
+        // return () => clearInterval(intervalId);
     }, []);
 
     return (
