@@ -17,6 +17,9 @@ const TimelineGraph: React.FC<TimelineGraphProps> = ({ data }) => {
     const uniqueDates = Array.from(
         new Set(data.map((item) => dayjs(item[0]).format("YYYY-MM-DD HH:mm")))
     );
+
+    const last30Dates = uniqueDates.slice(-30);
+
     console.log(uniqueDates);
     const filledData = uniqueDates.map(
         (dateTime) => [dateTime, "TRUE"] as [string, string]
@@ -31,9 +34,10 @@ const TimelineGraph: React.FC<TimelineGraphProps> = ({ data }) => {
 
     // Step 3: Fill in missing minutes between minTime and maxTime, marking them as FALSE
     const completeData: [string, string][] = [];
-    let currentTime = minTime;
+    let currentTime = maxTime.subtract(30, "minute"); // Start from 30 minutes before maxTime
+    const endTime = maxTime; // End at maxTime
 
-    while (currentTime.isBefore(maxTime) || currentTime.isSame(maxTime)) {
+    while (currentTime.isBefore(endTime) || currentTime.isSame(endTime)) {
         const currentTimeStr = currentTime.format("YYYY-MM-DD HH:mm");
 
         // Check if the current time exists in the filledData
