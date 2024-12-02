@@ -49,7 +49,15 @@ function HumanDetectionLog({ sheetData }: HumanDetectionLogProps) {
                     </Box>
                 </Fade>
             </Modal>
-            <div style={{ display: "flex", flexDirection: "row", gap: "20px" }}>
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: "20px",
+                    height: "40vh",
+                    marginBottom: "10vh",
+                }}
+            >
                 {/* Selected image display */}
 
                 <div

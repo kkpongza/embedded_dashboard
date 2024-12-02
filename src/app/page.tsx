@@ -41,7 +41,7 @@ export default function Home() {
                 style={{
                     textAlign: "center",
                     marginBottom: "20px",
-                    marginTop: "20px",
+                    marginTop: "10px",
                 }}
             >
                 Human Detection
