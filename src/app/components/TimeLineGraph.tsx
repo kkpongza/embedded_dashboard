@@ -18,8 +18,6 @@ const TimelineGraph: React.FC<TimelineGraphProps> = ({ data }) => {
         new Set(data.map((item) => dayjs(item[0]).format("YYYY-MM-DD HH:mm")))
     );
 
-    const last30Dates = uniqueDates.slice(-30);
-
     console.log(uniqueDates);
     const filledData = uniqueDates.map(
         (dateTime) => [dateTime, "TRUE"] as [string, string]

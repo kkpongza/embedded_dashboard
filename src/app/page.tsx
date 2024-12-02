@@ -12,7 +12,7 @@ export default function Home() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await fetch("/api/sheet");
+                const res = await fetch("/api/sheet", { cache: "no-store" });
                 if (!res.ok)
                     throw new Error("Failed to fetch Google Sheets data");
                 const data = await res.json();
